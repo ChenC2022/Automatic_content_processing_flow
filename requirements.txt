@@ -1,0 +1,12 @@
+# NFO文件解析器依赖包
+# 基础功能（必需）
+# 无额外依赖，使用Python标准库
+
+# HTML和PDF功能（可选）
+markdown>=3.4.0
+pdfkit>=1.0.0
+
+# 注意：使用PDF功能还需要安装wkhtmltopdf
+# Ubuntu/Debian: sudo apt-get install wkhtmltopdf
+# macOS: brew install wkhtmltopdf
+# Windows: 下载并安装 https://wkhtmltopdf.org/downloads.html
