@@ -219,7 +219,7 @@ class NfoParser:
         markdown_content.append(f"总计视频数量: {len(self.video_data)}")
         markdown_content.append("")
         
-        # 生成目录
+        # 生成目录（无跳转链接）
         markdown_content.append("## 📋 目录")
         markdown_content.append("")
         
@@ -231,12 +231,11 @@ class NfoParser:
                 categorized_data[tag] = []
             categorized_data[tag].append(item)
         
-        # 生成目录结构（带跳转链接）
+        # 生成目录结构（无跳转链接）
         for tag, items in sorted(categorized_data.items()):
             markdown_content.append(f"### {tag}")
             for item in items:
-                anchor = self._generate_anchor(item['title'])
-                markdown_content.append(f"- [{item['title']}](#{anchor})")
+                markdown_content.append(f"- {item['title']}")
             markdown_content.append("")
         
         markdown_content.append("---")
@@ -244,10 +243,7 @@ class NfoParser:
         
         # 按视频生成内容，每个视频一个独立章节
         for item in self.video_data:
-            # 生成锚点ID
-            anchor = self._generate_anchor(item['title'])
-            
-            # 视频标题作为二级标题，Markdown会自动生成锚点
+            # 视频标题作为二级标题
             markdown_content.append(f"## 视频标题：{item['title']}")
             markdown_content.append("")
             
@@ -400,7 +396,7 @@ class NfoParser:
     
     def generate_pdf(self, output_file: str = None) -> str:
         """
-        生成PDF文件（带章节跳转功能）
+        生成PDF文件（无章节跳转功能）
         
         Args:
             output_file: 输出文件路径，默认为当前目录下的汇总文件
@@ -418,15 +414,18 @@ class NfoParser:
             print("或者使用HTML格式输出")
             return ""
         
-        # 生成带跳转功能的HTML内容
-        html_content = self._generate_html_with_toc_for_pdf()
+        # 生成无跳转功能的HTML内容
+        html_content = self._generate_html_no_toc()
         
         # 写入文件
         if output_file is None:
             output_file = self.base_directory / "心理科普视频内容汇总.pdf"
         
         try:
-            # 配置PDF选项，启用目录和书签功能
+            # 检查中文字体支持
+            self._check_chinese_fonts()
+            
+            # 配置PDF选项，优化中文支持
             options = {
                 'page-size': 'A4',
                 'margin-top': '0.75in',
@@ -435,21 +434,21 @@ class NfoParser:
                 'margin-left': '0.75in',
                 'encoding': "UTF-8",
                 'enable-local-file-access': None,
-                'outline': None,  # 启用PDF大纲/书签
-                'outline-depth': 3,  # 设置大纲深度
                 'print-media-type': None,  # 优化打印媒体类型
                 'disable-smart-shrinking': None,  # 禁用智能缩放以保持格式
-                'javascript-delay': 1000,  # 延迟执行JavaScript，确保锚点正确生成
                 'load-error-handling': 'ignore',  # 忽略加载错误
                 'load-media-error-handling': 'ignore',  # 忽略媒体加载错误
-                'no-pdf-compression': None,  # 禁用PDF压缩以保持格式
+                'no-outline': None,  # 禁用大纲
+                'disable-external-links': None,  # 禁用外部链接
+                'disable-forms': None,  # 禁用表单
+                'disable-javascript': None,  # 禁用JavaScript
+                'quiet': None,  # 静默模式
             }
             
             # 生成PDF
             pdfkit.from_string(html_content, str(output_file), options=options)
             print(f"PDF文件已生成: {output_file}")
-            print("PDF包含可点击的目录和章节跳转功能")
-            print("注意：PDF中的链接现在应该正确跳转到内部章节")
+            print("PDF包含目录结构，但不包含跳转功能")
             return str(output_file)
             
         except Exception as e:
@@ -475,7 +474,7 @@ class NfoParser:
         markdown_content.append(f"总计视频数量: {len(self.video_data)}")
         markdown_content.append("")
         
-        # 生成目录
+        # 生成目录（无跳转链接）
         markdown_content.append("## 📋 目录")
         markdown_content.append("")
         
@@ -487,12 +486,11 @@ class NfoParser:
                 categorized_data[tag] = []
             categorized_data[tag].append(item)
         
-        # 生成目录结构（带跳转链接）
+        # 生成目录结构（无跳转链接）
         for tag, items in sorted(categorized_data.items()):
             markdown_content.append(f"### {tag}")
             for item in items:
-                anchor = self._generate_anchor(item['title'])
-                markdown_content.append(f"- [{item['title']}](#{anchor})")
+                markdown_content.append(f"- {item['title']}")
             markdown_content.append("")
         
         markdown_content.append("---")
@@ -500,10 +498,7 @@ class NfoParser:
         
         # 按视频生成内容，每个视频一个独立章节
         for item in self.video_data:
-            # 生成锚点ID
-            anchor = self._generate_anchor(item['title'])
-            
-            # 视频标题作为二级标题，Markdown会自动生成锚点
+            # 视频标题作为二级标题
             markdown_content.append(f"## 视频标题：{item['title']}")
             markdown_content.append("")
             
@@ -780,8 +775,12 @@ class NfoParser:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>心理科普视频内容汇总</title>
     <style>
+        @font-face {{
+            font-family: 'ChineseFont';
+            src: local('Noto Sans CJK SC'), local('Source Han Sans SC'), local('PingFang SC'), local('Hiragino Sans GB'), local('Microsoft YaHei'), local('SimSun'), local('WenQuanYi Micro Hei');
+        }}
         body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            font-family: 'ChineseFont', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'SimSun', 'WenQuanYi Micro Hei', sans-serif;
             line-height: 1.6;
             max-width: 1200px;
             margin: 0 auto;
@@ -945,6 +944,48 @@ class NfoParser:
             html_parts.append('<hr>')
         
         return '\n'.join(html_parts)
+    
+    def _check_chinese_fonts(self):
+        """
+        检查系统中是否安装了中文字体
+        """
+        import subprocess
+        import platform
+        
+        system = platform.system().lower()
+        chinese_fonts = []
+        
+        try:
+            if system == 'linux':
+                # 检查Linux系统中的中文字体
+                result = subprocess.run(['fc-list', ':lang=zh'], 
+                                      capture_output=True, text=True, timeout=10)
+                if result.returncode == 0 and result.stdout.strip():
+                    chinese_fonts = result.stdout.strip().split('\n')
+            elif system == 'darwin':  # macOS
+                # 检查macOS系统中的中文字体
+                result = subprocess.run(['system_profiler', 'SPFontsDataType'], 
+                                      capture_output=True, text=True, timeout=10)
+                if result.returncode == 0:
+                    # 简单的字体检查
+                    chinese_fonts = ['PingFang SC', 'Hiragino Sans GB']  # macOS通常有这些字体
+            elif system == 'windows':
+                # Windows通常有中文字体
+                chinese_fonts = ['Microsoft YaHei', 'SimSun']
+            
+            if not chinese_fonts:
+                print("警告：未检测到中文字体，PDF中的中文可能显示为方块")
+                print("建议安装中文字体：")
+                print("  Ubuntu/Debian: sudo apt install fonts-noto-cjk")
+                print("  CentOS/RHEL:   sudo yum install google-noto-cjk-fonts")
+                print("  macOS:         系统通常已包含中文字体")
+                print("  Windows:       系统通常已包含中文字体")
+            else:
+                print(f"检测到中文字体支持，共找到 {len(chinese_fonts)} 个字体")
+                
+        except Exception as e:
+            print(f"字体检查失败: {e}")
+            print("如果PDF中文显示异常，请确保系统已安装中文字体")
 
 
 def main():

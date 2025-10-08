@@ -33,12 +33,16 @@ case $SYSTEM_TYPE in
         sudo apt install -y python3-markdown python3-pdfkit
         echo "安装wkhtmltopdf..."
         sudo apt install -y wkhtmltopdf
+        echo "安装中文字体支持..."
+        sudo apt install -y fonts-noto-cjk fonts-wqy-zenhei fonts-wqy-microhei
         ;;
     "redhat")
         echo "使用yum安装依赖..."
         sudo yum install -y python3-markdown python3-pdfkit
         echo "安装wkhtmltopdf..."
         sudo yum install -y wkhtmltopdf
+        echo "安装中文字体支持..."
+        sudo yum install -y google-noto-cjk-fonts wqy-zenhei-fonts wqy-microhei-fonts
         ;;
     "macos")
         echo "使用brew安装依赖..."

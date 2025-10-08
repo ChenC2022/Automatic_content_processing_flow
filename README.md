@@ -155,20 +155,33 @@ pip install -r requirements.txt
 ```
 
 ### PDF功能额外要求
-生成PDF需要安装wkhtmltopdf工具：
+生成PDF需要安装wkhtmltopdf工具和中文字体：
 
 ```bash
 # Ubuntu/Debian
 sudo apt install python3-markdown python3-pdfkit wkhtmltopdf
+sudo apt install fonts-noto-cjk fonts-wqy-zenhei fonts-wqy-microhei
 
 # CentOS/RHEL
 sudo yum install python3-markdown python3-pdfkit wkhtmltopdf
+sudo yum install google-noto-cjk-fonts wqy-zenhei-fonts wqy-microhei-fonts
 
 # macOS
 brew install python-markdown pdfkit wkhtmltopdf
+# macOS通常已包含中文字体
 
 # Windows
 # 下载并安装：https://wkhtmltopdf.org/downloads.html
+# Windows通常已包含中文字体
+```
+
+**快速安装**：使用提供的安装脚本
+```bash
+# 安装所有依赖（包括中文字体）
+bash install_dependencies.sh
+
+# 或仅安装中文字体
+bash install_chinese_fonts.sh
 ```
 
 **注意**：如果遇到权限问题或外部管理环境错误，请参考 `PDF功能安装说明.md` 文件获取详细解决方案。
@@ -228,9 +241,17 @@ brew install python-markdown pdfkit wkhtmltopdf
 
 ---
 
-*最后更新：2025-10-01*
+*最后更新：2025-10-08*
 
 ## 版本历史
+
+- **v1.1** (2025-10-08)
+  - ✅ 修复PDF中文显示问题
+  - ✅ 添加中文字体自动检测功能
+  - ✅ 优化PDF生成配置
+  - ✅ 更新安装脚本，包含中文字体安装
+  - ✅ 完善故障排除文档
+  - ✅ 创建专用中文字体安装脚本
 
 - **v1.0** (2025-10-01)
   - 修复PDF首页空白页问题

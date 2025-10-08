@@ -12,11 +12,15 @@
 ```bash
 sudo apt update
 sudo apt install python3-markdown python3-pdfkit wkhtmltopdf
+# 安装中文字体支持（解决PDF中文显示问题）
+sudo apt install fonts-noto-cjk fonts-wqy-zenhei fonts-wqy-microhei
 ```
 
 #### CentOS/RHEL系统
 ```bash
 sudo yum install python3-markdown python3-pdfkit wkhtmltopdf
+# 安装中文字体支持（解决PDF中文显示问题）
+sudo yum install google-noto-cjk-fonts wqy-zenhei-fonts wqy-microhei-fonts
 ```
 
 #### macOS系统
@@ -89,6 +93,55 @@ python3 nfo_parser.py -f all
 1. **权限不足**：确保有sudo权限来安装系统包
 2. **网络问题**：确保网络连接正常，可以下载包
 3. **包不存在**：某些旧版本系统可能没有这些包，请更新系统
+
+### PDF中文显示问题
+
+如果生成的PDF文件中中文显示为方块或乱码，这是字体问题：
+
+#### 问题原因
+- 系统中没有安装中文字体
+- wkhtmltopdf无法找到合适的中文字体
+
+#### 解决方案
+
+**Ubuntu/Debian系统：**
+```bash
+# 安装中文字体包
+sudo apt install fonts-noto-cjk fonts-wqy-zenhei fonts-wqy-microhei
+
+# 刷新字体缓存
+sudo fc-cache -fv
+
+# 验证字体安装
+fc-list :lang=zh
+```
+
+**CentOS/RHEL系统：**
+```bash
+# 安装中文字体包
+sudo yum install google-noto-cjk-fonts wqy-zenhei-fonts wqy-microhei-fonts
+
+# 刷新字体缓存
+sudo fc-cache -fv
+```
+
+**macOS系统：**
+```bash
+# macOS通常已包含中文字体，如果仍有问题：
+brew install font-noto-cjk
+```
+
+**Windows系统：**
+- Windows系统通常已包含中文字体（Microsoft YaHei、SimSun等）
+- 如果仍有问题，请确保系统语言设置为中文
+
+#### 验证修复
+安装字体后，重新运行程序生成PDF：
+```bash
+python3 nfo_parser.py -f pdf
+```
+
+程序会自动检测中文字体支持并给出相应提示。
 
 ### 获取帮助
 
